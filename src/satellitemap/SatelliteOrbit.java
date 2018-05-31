@@ -247,11 +247,11 @@ public class SatelliteOrbit
     satpos.setX(coordinates[0]);
     satpos.setY(coordinates[1]);
     satpos.setZ(coordinates[2]);
-    System.out.println("X= "+ coordinates[0] + " Y=" + coordinates[1] + " Z=" + coordinates[2]);
+    //System.out.println("X= "+ coordinates[0] + " Y=" + coordinates[1] + " Z=" + coordinates[2]);
 
     double latitude = Math.asin(coordinates[2] / Math.sqrt(coordinates[0] * coordinates[0] + coordinates[1] * coordinates[1] + coordinates[2] * coordinates[2]) ) / Math.PI * 180.0;
     double longitude = Math.atan2(coordinates[1] , coordinates[0] )/Math.PI * 180.0;
 
-    System.out.println("latitude = " + latitude + " longitude = " + longitude);
+    //System.out.println("latitude = " + latitude + " longitude = " + longitude);
    }
  }

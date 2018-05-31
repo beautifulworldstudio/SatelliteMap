@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -16,10 +18,11 @@ import javax.swing.JPanel;
 
 public class SatelliteTest extends JPanel implements WindowListener
  {
-//ISS(ZARYA)
-  String first =  "1 25544U 98067A   18150.92127221  .00001226  00000-0  25793-4 0  9992";
-  String second = "2 25544  51.6391 104.7815 0003970 137.3663 325.3733 15.54111493115839";
-
+  //ISS(ZARYA)
+  private static final String first =  "1 25544U 98067A   18150.92127221  .00001226  00000-0  25793-4 0  9992";
+  private static final String second = "2 25544  51.6391 104.7815 0003970 137.3663 325.3733 15.54111493115839";
+  private static final String imagedir ="img";
+  private static final String mapimage= "map.png";
 
   private static final double camangle  = 45.0 / 180.0 * Math.PI;
   private static final double[][] camera = new double[][]{
@@ -55,6 +58,8 @@ public class SatelliteTest extends JPanel implements WindowListener
   private int imageHeight;
   private double longitudeleft = -29.6;
 
+
+
   public SatelliteTest() throws IOException
    {
     window = new JFrame("View From ISS");
@@ -67,9 +72,13 @@ public class SatelliteTest extends JPanel implements WindowListener
     position = new SatellitePosition();
     after5sec = new SatellitePosition();
 
-    earth = ImageIO.read(new File("C:\\Users\\Kentaro\\Documents\\java\\satellitemap\\map.png"));
+    String path = new File(".").getAbsoluteFile().getParent() + File.separator + imagedir + File.separator + mapimage;
+
+    earth = ImageIO.read(new File(path));
     imageWidth = earth.getWidth();
     imageHeight = earth.getHeight();
+
+    getSatellitePosition();
    }
 
   public void windowActivated(WindowEvent w){}
@@ -84,10 +93,9 @@ public class SatelliteTest extends JPanel implements WindowListener
     System.exit(0);
    }
 
+
   public void paint(Graphics g)
    {
-    getSatellitePosition();
-
     double[][] transVector = getXYZVector();
     double[][] scrVector = new double[3][3];
 
@@ -169,14 +177,24 @@ public class SatelliteTest extends JPanel implements WindowListener
 
     targettime.clear();
     targettime.setTimeZone(tz);
-    targettime.set(2016, 0, 16,  23, 30 , 0);
+    long current = System.currentTimeMillis();
+
+    targettime.setTimeInMillis(current);
     SatelliteOrbit.getOrbitalPosition(targettime, sat, position);
 
-    targettime.clear();
-    targettime.setTimeZone(tz);
-    targettime.set(2012, 0, 16,  23, 30 , 10);
+    targettime.add(Calendar.SECOND,  5);
     SatelliteOrbit.getOrbitalPosition(targettime, sat, after5sec);
+
+    new Timer().schedule(new TimerTask()
+     {
+      @Override public void run()
+       {
+        getSatellitePosition();
+        repaint();
+       }
+     }, 5000);
    }
+
 
   private void revice(double[][] mat)
    {
